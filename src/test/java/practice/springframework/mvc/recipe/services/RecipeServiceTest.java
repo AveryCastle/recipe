@@ -5,29 +5,30 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
+import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import practice.springframework.mvc.recipe.domain.Recipe;
 import practice.springframework.mvc.recipe.repositories.RecipeRepository;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
-@RunWith(SpringRunner.class)
-@SpringBootTest
 public class RecipeServiceTest {
 
-    @Autowired
     private RecipeService recipeService;
 
-    @MockBean
+    @Mock
     private RecipeRepository recipeRepository;
+
+    @Before
+    public void setUp() {
+        MockitoAnnotations.initMocks(this);
+
+        recipeService = new RecipeService(recipeRepository);
+    }
 
     @Test
     public void findAll() {

@@ -1,6 +1,7 @@
 package practice.springframework.mvc.recipe.controllers;
 
-import static org.hamcrest.core.StringContains.containsString;
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
@@ -8,59 +9,43 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 
+import org.hamcrest.Matchers;
+import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import practice.springframework.mvc.recipe.domain.Recipe;
 import practice.springframework.mvc.recipe.services.RecipeService;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.ui.Model;
 
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
-@RunWith(SpringRunner.class)
-@WebMvcTest
 public class IndexControllerTest {
 
-    @Autowired
-    private MockMvc mockMvc;
-
-    @MockBean
+    @Mock
     private Model model;
 
-    @MockBean
+    @Mock
     private RecipeService recipeService;
 
-    @Autowired
+    private MockMvc mockMvc;
+
     private IndexController indexController;
 
-    @Test
-    public void indexShouldReturnRecipesFromService() throws Exception {
-        // Given.
-        final Long ID = 1L;
-        final Recipe prepared = Recipe.builder().id(ID).description("Delicious").build();
-        final Set<Recipe> recipes = new HashSet<>(Arrays.asList(prepared));
-        when(recipeService.findAll()).thenReturn(recipes);
-
-        // When & Then.
-        mockMvc.perform(get("/"))
-                .andDo(print())
-                .andExpect(status().isOk())
-                .andExpect(view().name("index"))
-                .andExpect(content().string(containsString("Delicious")));
-
-        verify(recipeService, times(1)).findAll();
+    @Before
+    public void setUp() {
+        MockitoAnnotations.initMocks(this);
+        indexController = new IndexController(recipeService);
     }
 
     @Test
@@ -87,5 +72,26 @@ public class IndexControllerTest {
         verify(model, times(1)).addAttribute(eq("recipes"), argumentCaptor.capture());
         Set<Recipe> setInController = argumentCaptor.getValue();
         assertEquals(2, setInController.size());
+    }
+
+    @Test
+    public void indexShouldReturnRecipesFromService_withMockMvc() throws Exception {
+        // Given.
+        mockMvc = MockMvcBuilders.standaloneSetup(indexController).build();
+
+        final Long ID = 1L;
+        final Recipe prepared = Recipe.builder().id(ID).description("Delicious").build();
+        final Set<Recipe> recipes = new HashSet<>(Arrays.asList(prepared));
+        when(recipeService.findAll()).thenReturn(recipes);
+
+        // When & Then.
+        mockMvc.perform(get("/"))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(view().name("index"))
+                .andExpect(model().attribute("recipes", contains(Matchers.hasProperty("description", is("Delicious")))))
+        ;
+
+        verify(recipeService, times(1)).findAll();
     }
 }
