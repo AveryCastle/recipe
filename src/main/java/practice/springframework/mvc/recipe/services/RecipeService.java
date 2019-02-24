@@ -1,6 +1,9 @@
 package practice.springframework.mvc.recipe.services;
 
 import lombok.extern.slf4j.Slf4j;
+import practice.springframework.mvc.recipe.commands.RecipeCommand;
+import practice.springframework.mvc.recipe.converter.RecipeCommandToRecipe;
+import practice.springframework.mvc.recipe.converter.RecipeToRecipeCommand;
 import practice.springframework.mvc.recipe.domain.Recipe;
 import practice.springframework.mvc.recipe.repositories.RecipeRepository;
 
@@ -15,13 +18,21 @@ public class RecipeService {
 
     private final RecipeRepository recipeRepository;
 
-    public RecipeService(RecipeRepository recipeRepository) {
+    private final RecipeCommandToRecipe recipeCommandToRecipe;
+
+    private final RecipeToRecipeCommand recipeToRecipeCommand;
+
+    public RecipeService(RecipeRepository recipeRepository,
+                         RecipeCommandToRecipe recipeCommandToRecipe,
+                         RecipeToRecipeCommand recipeToRecipeCommand) {
         this.recipeRepository = recipeRepository;
+        this.recipeCommandToRecipe = recipeCommandToRecipe;
+        this.recipeToRecipeCommand = recipeToRecipeCommand;
     }
 
     public Set<Recipe> findAll() {
         log.debug("I'm the RecipeSerivce.");
-        
+
         Iterable<Recipe> recipes = recipeRepository.findAll();
 
         Set<Recipe> recipeSet = new HashSet<>();
@@ -32,5 +43,13 @@ public class RecipeService {
 
     public Recipe findById(Long id) {
         return recipeRepository.findById(id).orElse(new Recipe());
+    }
+
+    public RecipeCommand save(RecipeCommand recipeCommand) {
+        Recipe recipe = recipeCommandToRecipe.convert(recipeCommand);
+
+        Recipe savedRecipe = recipeRepository.save(recipe);
+
+        return recipeToRecipeCommand.convert(savedRecipe);
     }
 }
