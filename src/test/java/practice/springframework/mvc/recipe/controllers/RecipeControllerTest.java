@@ -16,6 +16,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import practice.springframework.mvc.recipe.domain.Recipe;
+import practice.springframework.mvc.recipe.exceptions.GlobalExceptionHandler;
 import practice.springframework.mvc.recipe.exceptions.NotFoundException;
 import practice.springframework.mvc.recipe.services.RecipeService;
 
@@ -41,7 +42,9 @@ public class RecipeControllerTest {
         MockitoAnnotations.initMocks(this);
         recipeController = new RecipeController(recipeService);
 
-        mockMvc = MockMvcBuilders.standaloneSetup(recipeController).build();
+        mockMvc = MockMvcBuilders.standaloneSetup(recipeController)
+                .setControllerAdvice(new GlobalExceptionHandler())
+                .build();
 
         recipe = Recipe.builder().id(ID).description("Making Chiabata Bread").build();
     }
