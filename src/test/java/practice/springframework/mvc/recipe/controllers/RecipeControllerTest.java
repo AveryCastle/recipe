@@ -59,11 +59,11 @@ public class RecipeControllerTest {
 
     @Test
     public void givenNotFound_whenFind_thenThrowException() throws Exception {
-        String message = String.format("id(%d) Not Found Entity", ID);
-        when(recipeService.findById(anyLong())).thenThrow(new NotFoundException(message));
+        when(recipeService.findById(anyLong())).thenThrow(NotFoundException.class);
 
         mockMvc.perform(get("/recipe/show/" + ID))
                 .andDo(print())
-                .andExpect(status().isNotFound());
+                .andExpect(status().isNotFound())
+                .andExpect(view().name("404"));
     }
 }
