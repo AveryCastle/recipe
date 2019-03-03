@@ -1,6 +1,9 @@
 package practice.springframework.mvc.recipe.services;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.BDDMockito.given;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -8,11 +11,14 @@ import practice.springframework.mvc.recipe.commands.RecipeCommand;
 import practice.springframework.mvc.recipe.converter.RecipeCommandToRecipe;
 import practice.springframework.mvc.recipe.converter.RecipeToRecipeCommand;
 import practice.springframework.mvc.recipe.domain.Recipe;
+import practice.springframework.mvc.recipe.exceptions.NotFoundException;
 import practice.springframework.mvc.recipe.repositories.RecipeRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+
+import java.util.Optional;
 
 import javax.transaction.Transactional;
 
@@ -51,5 +57,16 @@ public class RecipeServiceITest {
         assertEquals(testRecipe.getId(), savedRecipeCommand.getId());
         assertEquals(testRecipe.getCategorySet().size(), savedRecipeCommand.getCategories().size());
         assertEquals(testRecipe.getIngredientSet().size(), savedRecipeCommand.getIngredients().size());
+    }
+
+    @Test
+    public void givenNotFoundEntity_whenFind_thenThrowNotFoundException() {
+        given(recipeRepository.findById(anyLong())).willReturn(Optional.empty());
+
+        NotFoundException actual = assertThrows(NotFoundException.class, () -> {
+            recipeService.findById(1L);
+        });
+
+        assertEquals("id(1) Not Found Entity", actual.getMessage());
     }
 }

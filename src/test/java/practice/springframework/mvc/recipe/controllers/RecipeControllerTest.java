@@ -2,6 +2,7 @@ package practice.springframework.mvc.recipe.controllers;
 
 import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.is;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -15,6 +16,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import practice.springframework.mvc.recipe.domain.Recipe;
+import practice.springframework.mvc.recipe.exceptions.NotFoundException;
 import practice.springframework.mvc.recipe.services.RecipeService;
 
 import org.springframework.test.web.servlet.MockMvc;
@@ -53,5 +55,15 @@ public class RecipeControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(view().name("recipe/show"))
                 .andExpect(model().attribute("recipe", hasProperty("description", is("Making Chiabata Bread"))));
+    }
+
+    @Test
+    public void givenNotFound_whenFind_thenThrowException() throws Exception {
+        String message = String.format("id(%d) Not Found Entity", ID);
+        when(recipeService.findById(anyLong())).thenThrow(new NotFoundException(message));
+
+        mockMvc.perform(get("/recipe/show/" + ID))
+                .andDo(print())
+                .andExpect(status().isNotFound());
     }
 }

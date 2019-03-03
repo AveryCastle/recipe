@@ -5,6 +5,7 @@ import practice.springframework.mvc.recipe.commands.RecipeCommand;
 import practice.springframework.mvc.recipe.converter.RecipeCommandToRecipe;
 import practice.springframework.mvc.recipe.converter.RecipeToRecipeCommand;
 import practice.springframework.mvc.recipe.domain.Recipe;
+import practice.springframework.mvc.recipe.exceptions.NotFoundException;
 import practice.springframework.mvc.recipe.repositories.RecipeRepository;
 
 import org.springframework.stereotype.Service;
@@ -42,7 +43,8 @@ public class RecipeService {
     }
 
     public Recipe findById(Long id) {
-        return recipeRepository.findById(id).orElse(new Recipe());
+        String errorMessage = String.format("id(%d) Not Found Entity", id);
+        return recipeRepository.findById(id).orElseThrow(() -> new NotFoundException(errorMessage));
     }
 
     public RecipeCommand save(RecipeCommand recipeCommand) {
