@@ -2,9 +2,11 @@ package practice.springframework.mvc.recipe.controllers;
 
 import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.is;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -15,11 +17,13 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import practice.springframework.mvc.recipe.commands.RecipeCommand;
 import practice.springframework.mvc.recipe.domain.Recipe;
 import practice.springframework.mvc.recipe.exceptions.GlobalExceptionHandler;
 import practice.springframework.mvc.recipe.exceptions.NotFoundException;
 import practice.springframework.mvc.recipe.services.RecipeService;
 
+import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
@@ -76,5 +80,24 @@ public class RecipeControllerTest {
                 .andDo(print())
                 .andExpect(status().isBadRequest())
                 .andExpect(view().name("400"));
+    }
+
+    @Test
+    public void givenNewForm_whenSave_thenSuccess() throws Exception {
+        // Given
+        final Long ID = 2L;
+        RecipeCommand recipeCommand = new RecipeCommand();
+        recipeCommand.setId(ID);
+        when(recipeService.save(any())).thenReturn(recipeCommand);
+
+        // When & Then
+        mockMvc.perform(post("/recipe")
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                .param("id", "")
+                .param("description", "some description")
+                .param("direction", "some direction"))
+                .andDo(print())
+                .andExpect(status().is3xxRedirection())
+                .andExpect(view().name("redirect:/recipe/" + ID + "/show"));
     }
 }

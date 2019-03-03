@@ -1,6 +1,7 @@
 package practice.springframework.mvc.recipe.controllers;
 
 import lombok.extern.slf4j.Slf4j;
+import practice.springframework.mvc.recipe.commands.RecipeCommand;
 import practice.springframework.mvc.recipe.domain.Recipe;
 import practice.springframework.mvc.recipe.exceptions.NotFoundException;
 import practice.springframework.mvc.recipe.services.RecipeService;
@@ -8,12 +9,17 @@ import practice.springframework.mvc.recipe.services.RecipeService;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.servlet.ModelAndView;
+
+import javax.validation.Valid;
 
 @Controller
 @RequestMapping("/recipe")
@@ -32,6 +38,19 @@ public class RecipeController {
         model.addAttribute("recipe", recipe);
 
         return "recipe/show";
+    }
+
+    @PostMapping
+    public String save(@Valid @ModelAttribute("recipe") RecipeCommand recipeCommand, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            bindingResult.getAllErrors().forEach(objectError -> {
+                log.error(objectError.toString());
+            });
+        }
+
+        RecipeCommand saved = recipeService.save(recipeCommand);
+
+        return "redirect:/recipe/" + saved.getId() + "/show";
     }
 
     @ExceptionHandler(value = NotFoundException.class)
