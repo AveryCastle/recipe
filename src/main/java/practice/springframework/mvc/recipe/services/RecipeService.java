@@ -54,4 +54,8 @@ public class RecipeService {
 
         return recipeToRecipeCommand.convert(savedRecipe);
     }
+
+    public RecipeCommand findCommandById(Long id) {
+        return recipeToRecipeCommand.convert(findById(id));
+    }
 }
