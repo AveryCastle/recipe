@@ -66,4 +66,12 @@ public class RecipeControllerTest {
                 .andExpect(status().isNotFound())
                 .andExpect(view().name("404"));
     }
+
+    @Test
+    public void givenNonNumberParams_whenFind_thenThrowException() throws Exception {
+        mockMvc.perform(get("/recipe/show/no-number"))
+                .andDo(print())
+                .andExpect(status().isBadRequest())
+                .andExpect(view().name("400"));
+    }
 }
