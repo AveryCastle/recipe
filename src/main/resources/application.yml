@@ -97,4 +97,5 @@ logging:
         SQL: debug # show sql statement
         type:
           descriptor:
-            sql: trace # show sql values
+            sql:
+              BasicBinder: trace # show only sql binder ::values
