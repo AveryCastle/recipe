@@ -1,4 +1,4 @@
-#spring.profiles.active: local
+#spring.profiles.active: prod
 
 ---
 ## local
@@ -41,7 +41,7 @@ spring:
     username: sfg_dev_user
     password: sfg_dev_user1234
     driver-class-name: com.mysql.cj.jdbc.Driver
-    initialization-mode: always # embedded db가 아닌 이상 data.sql을 읽게 하고 싶으면 세팅해야 함.
+#    initialization-mode: always # embedded db가 아닌 이상 data.sql을 읽게 하고 싶으면 세팅해야 함.
   jpa:
     database: mysql
     hibernate:
@@ -79,7 +79,7 @@ spring:
     username: sfg_prod_user
     password: sfg_prod_user1234
     driver-class-name: com.mysql.cj.jdbc.Driver
-    initialization-mode: always # embedded db가 아닌 이상 data.sql을 읽게 하고 싶으면 세팅해야 함.
+#    initialization-mode: always # embedded db가 아닌 이상 data.sql을 읽게 하고 싶으면 세팅해야 함.
   jpa:
     database: mysql
     hibernate:

@@ -12,6 +12,7 @@ import practice.springframework.mvc.recipe.repositories.RecipeRepository;
 import practice.springframework.mvc.recipe.repositories.UnitOfMeasureRepository;
 
 import org.springframework.context.ApplicationListener;
+import org.springframework.context.annotation.Profile;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.stereotype.Component;
 
@@ -22,6 +23,7 @@ import java.util.Optional;
 
 @Component
 @Slf4j
+@Profile(value = {"default", "local"})
 public class RecipeBootstrap implements ApplicationListener<ContextRefreshedEvent> {
 
     private final CategoryRepository categoryRepository;
